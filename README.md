@@ -103,7 +103,7 @@ those are handed back for a rewrite rather than mangled by a regex.
 | SPECIFICITY | numbers, names and concrete markers per 100 words |
 | SLOP DENSITY | lexicon hits per 100 words |
 | FINGERPRINT | invisible characters, em dashes, curly quotes per 1,000 |
-| VOICE | contractions, person, structural tells |
+| VOICE | contractions, person, active voice, structural tells |
 
 The verdict weights the mean at 60% and the **weakest single check** at 40%,
 because a detector only needs one signal to fire.
@@ -115,7 +115,7 @@ Run against a deliberately terrible draft:
   SPECIFICITY   ######################## 100.0
   SLOP DENSITY  ........................   0.0    19 stock terms, 24.1 per 100 words
   FINGERPRINT   ........................   0.0    1 invisible, 1 em dash, 3 curly quote
-  VOICE         ########................  33.3    3 structural tells
+  VOICE         ########................  33.3    3 structural tells, 1 passive pattern
   ------------------------------------------------------------
   HUMAN SCORE   ######..................  24.8   FLAGGED
 ```

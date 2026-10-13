@@ -55,7 +55,13 @@ a sentence needs judgement:
 - Rocket, fire, bulb, sparkle and dart emoji
 - Hashtag walls
 - Reflex engagement bait: "Thoughts?", "Agree?", "Who else?"
+- Passive voice patterns: "was built", "were told", "is driven"
 - Uniform sentence length and uniform bullet length
+
+Humans use active voice most of the time. When a draft leans on passive voice,
+use active English instead: "We built it" instead of "It was built". That is a
+signal the detector should notice, and it is the one it should treat as a rewrite
+rather than a purely mechanical fix.
 
 That list is your job. Rewrite each flagged line by hand, keeping the meaning,
 then re-run `detect.py`. This is the part that moves the score from REVIEW to
@@ -71,7 +77,7 @@ PASS, and it is the part a script cannot do.
 | SPECIFICITY | numbers, names, concrete markers per 100 words | abstract nouns, no figures |
 | SLOP DENSITY | lexicon hits per 100 words | stock vocabulary |
 | FINGERPRINT | invisible chars, em dashes, curly quotes per 1k chars | typographically perfect |
-| VOICE | contractions, person, structural tells | no contractions, staged reveals |
+| VOICE | contractions, person, active voice, structural tells | no contractions, staged reveals, passive voice |
 
 The verdict weights the mean at 60% and the **weakest single check** at 40%,
 because a detector only needs one signal to fire. PASS needs an overall of 70+
