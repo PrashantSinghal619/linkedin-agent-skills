@@ -36,6 +36,10 @@ SENT_RE = re.compile(r"[^.!?\n]+[.!?]*")
 WORD_RE = re.compile(r"[A-Za-z']+")
 CONTRACTIONS = re.compile(r"\b\w+'(?:s|t|re|ve|ll|d|m)\b", re.IGNORECASE)
 PRONOUNS = re.compile(r"\b(i|me|my|mine|we|us|our|you|your)\b", re.IGNORECASE)
+PASSIVE = re.compile(
+    r"\b(?:am|is|are|was|were|be|been|being)\s+(?!not\b|still\b|already\b|just\b)(?:\w+\s+){0,3}\w+(?:ed|en|t|n)\b",
+    re.IGNORECASE,
+)
 NUMBERS = re.compile(r"\b\d[\d,.]*%?\b|\$\d")
 PROPER = re.compile(r"(?<![.!?]\s)(?<!^)\b[A-Z][a-z]{2,}\b", re.MULTILINE)
 
@@ -119,13 +123,14 @@ def check_fingerprint(text):
 
 
 def check_voice(text, lex):
-    """Contractions, person, and the shapes models default to."""
+    """Contractions, person, active voice, and the shapes models default to."""
     w = words(text)
     if len(w) < 25:
         return 50.0, "too short to judge"
     per100 = 100 / len(w)
     contractions = len(CONTRACTIONS.findall(text)) * per100
     person = len(PRONOUNS.findall(text)) * per100
+    passive = len(PASSIVE.findall(text)) * per100
     tells = 0
     names = []
     for s in lex["structures"]:
@@ -138,14 +143,16 @@ def check_voice(text, lex):
             names.append(s["id"])
     bullets = [len(b.split()) for b in re.findall(r"(?m)^\s*[-*•]\s+(.+)$", text)]
     uniform = (len(bullets) >= 3 and statistics.pstdev(bullets) < 1.6)
-    score = (scale(contractions, human=3.0, machine=0.0) * 0.35
-             + scale(person, human=8.0, machine=1.0) * 0.35
-             + clamp(100 - tells * 22) * 0.30)
+    score = (scale(contractions, human=3.0, machine=0.0) * 0.25
+             + scale(person, human=8.0, machine=1.0) * 0.25
+             + clamp(100 - passive * 26) * 0.25
+             + clamp(100 - tells * 22) * 0.25)
     if uniform:
         score -= 12
         names.append("uniform-bullets")
     detail = (f"{contractions:.1f} contractions, {person:.1f} personal pronouns "
-              f"per 100 words, {tells} structural tell(s)")
+             f"per 100 words, {passive:.1f} passive-voice patterns per 100 words, "
+             f"{tells} structural tell(s)")
     if names:
         detail += " [" + ", ".join(names[:4]) + "]"
     return clamp(score), detail
